@@ -1,0 +1,201 @@
+
+> prop-firm-platform@0.1.0 prebuild
+> node scripts/sync-db-provider.mjs
+
+
+> prop-firm-platform@0.1.0 build
+> prisma generate && next build
+
+warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).
+For more information, see: https://pris.ly/prisma-config
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+✔ Generated Prisma Client (v6.19.3) to .\node_modules\@prisma\client in 138ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Interested in query caching in just a few lines of code? Try Accelerate today! https://pris.ly/tip-3-accelerate
+
+   ▲ Next.js 15.5.22
+   - Environments: .env
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 41s
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/111) ...
+   Generating static pages (27/111) 
+   Generating static pages (55/111) 
+   Generating static pages (83/111) 
+ ✓ Generating static pages (111/111)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                 Size  First Load JS
+┌ ○ /_not-found                             1 kB         104 kB
+├ ● /[locale]                            4.47 kB         119 kB
+├   ├ /fa
+├   └ /en
+├ ƒ /[locale]/[...rest]                    255 B         103 kB
+├ ● /[locale]/about                        701 B         112 kB
+├   ├ /fa/about
+├   └ /en/about
+├ ● /[locale]/admin                        255 B         103 kB
+├   ├ /fa/admin
+├   └ /en/admin
+├ ● /[locale]/admin-login                2.54 kB         108 kB
+├   ├ /fa/admin-login
+├   └ /en/admin-login
+├ ● /[locale]/admin/accounts             4.56 kB         111 kB
+├   ├ /fa/admin/accounts
+├   └ /en/admin/accounts
+├ ● /[locale]/admin/discounts            1.97 kB         105 kB
+├   ├ /fa/admin/discounts
+├   └ /en/admin/discounts
+├ ● /[locale]/admin/kyc                    858 B         103 kB
+├   ├ /fa/admin/kyc
+├   └ /en/admin/kyc
+├ ● /[locale]/admin/orders               2.71 kB         105 kB
+├   ├ /fa/admin/orders
+├   └ /en/admin/orders
+├ ● /[locale]/admin/payouts               1.1 kB         104 kB
+├   ├ /fa/admin/payouts
+├   └ /en/admin/payouts
+├ ● /[locale]/admin/reviews                776 B         103 kB
+├   ├ /fa/admin/reviews
+├   └ /en/admin/reviews
+├ ● /[locale]/admin/rules                1.41 kB         104 kB
+├   ├ /fa/admin/rules
+├   └ /en/admin/rules
+├ ● /[locale]/admin/tickets               1.7 kB         104 kB
+├   ├ /fa/admin/tickets
+├   └ /en/admin/tickets
+├ ● /[locale]/admin/users                1.08 kB         104 kB
+├   ├ /fa/admin/users
+├   └ /en/admin/users
+├ ● /[locale]/blog                         255 B         103 kB
+├   ├ /fa/blog
+├   └ /en/blog
+├ ● /[locale]/contact                      851 B         103 kB
+├   ├ /fa/contact
+├   └ /en/contact
+├ ● /[locale]/dashboard                    164 B         106 kB
+├   ├ /fa/dashboard
+├   └ /en/dashboard
+├ ● /[locale]/dashboard/accounts         1.26 kB         111 kB
+├   ├ /fa/dashboard/accounts
+├   └ /en/dashboard/accounts
+├ ● /[locale]/dashboard/analysis           910 B         111 kB
+├   ├ /fa/dashboard/analysis
+├   └ /en/dashboard/analysis
+├ ● /[locale]/dashboard/buy              4.12 kB         110 kB
+├   ├ /fa/dashboard/buy
+├   └ /en/dashboard/buy
+├ ● /[locale]/dashboard/certificates       255 B         103 kB
+├   ├ /fa/dashboard/certificates
+├   └ /en/dashboard/certificates
+├ ● /[locale]/dashboard/discounts          255 B         103 kB
+├   ├ /fa/dashboard/discounts
+├   └ /en/dashboard/discounts
+├ ● /[locale]/dashboard/kyc              1.86 kB         104 kB
+├   ├ /fa/dashboard/kyc
+├   └ /en/dashboard/kyc
+├ ● /[locale]/dashboard/orders             168 B         106 kB
+├   ├ /fa/dashboard/orders
+├   └ /en/dashboard/orders
+├ ● /[locale]/dashboard/payouts          2.74 kB         105 kB
+├   ├ /fa/dashboard/payouts
+├   └ /en/dashboard/payouts
+├ ● /[locale]/dashboard/profile          1.04 kB         104 kB
+├   ├ /fa/dashboard/profile
+├   └ /en/dashboard/profile
+├ ● /[locale]/dashboard/referrals          667 B         103 kB
+├   ├ /fa/dashboard/referrals
+├   └ /en/dashboard/referrals
+├ ● /[locale]/dashboard/tickets          1.97 kB         105 kB
+├   ├ /fa/dashboard/tickets
+├   └ /en/dashboard/tickets
+├ ● /[locale]/dashboard/wallet           1.82 kB         104 kB
+├   ├ /fa/dashboard/wallet
+├   └ /en/dashboard/wallet
+├ ● /[locale]/faq                          821 B         112 kB
+├   ├ /fa/faq
+├   └ /en/faq
+├ ● /[locale]/forgot-password            1.91 kB         108 kB
+├   ├ /fa/forgot-password
+├   └ /en/forgot-password
+├ ● /[locale]/login                      2.54 kB         108 kB
+├   ├ /fa/login
+├   └ /en/login
+├ ● /[locale]/payouts                    2.69 kB         109 kB
+├   ├ /fa/payouts
+├   └ /en/payouts
+├ ● /[locale]/plans                        185 B         115 kB
+├   ├ /fa/plans
+├   └ /en/plans
+├ ● /[locale]/register                   2.54 kB         108 kB
+├   ├ /fa/register
+├   └ /en/register
+├ ● /[locale]/rules                        821 B         112 kB
+├   ├ /fa/rules
+├   └ /en/rules
+├ ƒ /api/accounts/advance                  255 B         103 kB
+├ ƒ /api/accounts/check                    255 B         103 kB
+├ ƒ /api/accounts/myfxbook                 255 B         103 kB
+├ ƒ /api/accounts/sync                     255 B         103 kB
+├ ƒ /api/admin/accounts                    255 B         103 kB
+├ ƒ /api/admin/accounts/sync-all           255 B         103 kB
+├ ƒ /api/admin/certificates                255 B         103 kB
+├ ƒ /api/admin/discounts                   255 B         103 kB
+├ ƒ /api/admin/kyc                         255 B         103 kB
+├ ƒ /api/admin/orders                      255 B         103 kB
+├ ƒ /api/admin/orders/review               255 B         103 kB
+├ ƒ /api/admin/orders/settle               255 B         103 kB
+├ ƒ /api/admin/payouts                     255 B         103 kB
+├ ƒ /api/admin/reviews                     255 B         103 kB
+├ ƒ /api/admin/rules                       255 B         103 kB
+├ ƒ /api/admin/tickets                     255 B         103 kB
+├ ƒ /api/admin/wallet                      255 B         103 kB
+├ ƒ /api/auth/forgot                       255 B         103 kB
+├ ƒ /api/auth/login                        255 B         103 kB
+├ ƒ /api/auth/logout                       255 B         103 kB
+├ ƒ /api/auth/me                           255 B         103 kB
+├ ƒ /api/auth/refresh                      255 B         103 kB
+├ ƒ /api/auth/register                     255 B         103 kB
+├ ƒ /api/auth/resend-code                  255 B         103 kB
+├ ƒ /api/auth/reset                        255 B         103 kB
+├ ƒ /api/auth/verify-email                 255 B         103 kB
+├ ƒ /api/bridge/accounts                   255 B         103 kB
+├ ƒ /api/bridge/roster                     255 B         103 kB
+├ ƒ /api/certificates/[id]                 255 B         103 kB
+├ ƒ /api/checkout/quote                    255 B         103 kB
+├ ƒ /api/contact                           255 B         103 kB
+├ ƒ /api/cron/monitor                      255 B         103 kB
+├ ƒ /api/kyc                               255 B         103 kB
+├ ƒ /api/kyc/image/[id]                    255 B         103 kB
+├ ƒ /api/orders                            255 B         103 kB
+├ ƒ /api/payments/paystar/callback         255 B         103 kB
+├ ƒ /api/payments/usdt/verify              255 B         103 kB
+├ ƒ /api/payouts                           255 B         103 kB
+├ ƒ /api/profile                           255 B         103 kB
+├ ƒ /api/reviews                           255 B         103 kB
+├ ƒ /api/tickets                           255 B         103 kB
+├ ƒ /api/wallet                            255 B         103 kB
+├ ○ /icon.svg                                0 B            0 B
+├ ○ /manifest.webmanifest                  255 B         103 kB
+├ ○ /robots.txt                            255 B         103 kB
+└ ○ /sitemap.xml                           255 B         103 kB
++ First Load JS shared by all             103 kB
+  ├ chunks/1255-31f47ebe9b12c7e5.js      46.3 kB
+  ├ chunks/4bd1b696-f785427dddbba9fb.js  54.2 kB
+  └ other shared chunks (total)             2 kB
+
+
+ƒ Middleware                             40.2 kB
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+

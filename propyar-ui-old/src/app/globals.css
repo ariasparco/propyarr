@@ -1,0 +1,233 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* IRANYekanX — Persian brand font (per brand guide).
+   The licensed font files are not bundled. To activate: drop the files into
+   /public/fonts/ and UNCOMMENT the @font-face block below. Until then Persian
+   renders in Vazirmatn (visually near-identical), with no failed requests. */
+/*
+@font-face {
+  font-family: 'IRANYekanX';
+  src: url('/fonts/IRANYekanX-Regular.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'IRANYekanX';
+  src: url('/fonts/IRANYekanX-Medium.woff2') format('woff2');
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'IRANYekanX';
+  src: url('/fonts/IRANYekanX-Bold.woff2') format('woff2');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'IRANYekanX';
+  src: url('/fonts/IRANYekanX-ExtraBold.woff2') format('woff2');
+  font-weight: 800; font-style: normal; font-display: swap;
+}
+*/
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    /* Display + mono both use the Latin brand font (Plus Jakarta Sans). */
+    --font-display: var(--font-sans);
+    --font-mono: var(--font-sans);
+  }
+
+  * {
+    border-color: theme('colors.line');
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+    scroll-padding-top: 6rem;
+  }
+
+  body {
+    @apply bg-ink-900 text-white/85 antialiased;
+    font-family: var(--font-sans), system-ui, sans-serif;
+    background-image: radial-gradient(
+        60rem 60rem at 50% -20rem,
+        rgba(46,235,158, 0.08),
+        transparent 60%
+      ),
+      radial-gradient(
+        48rem 48rem at 100% 8rem,
+        rgba(9,54,36, 0.35),
+        transparent 58%
+      ),
+      radial-gradient(
+        44rem 44rem at 0% 40rem,
+        rgba(9,54,36, 0.22),
+        transparent 60%
+      );
+    background-attachment: fixed;
+  }
+
+  /* Persian: one uniform typeface everywhere (IRANYekanX, falling back to
+     Vazirmatn). The Latin brand font (Plus Jakarta Sans) has no Persian glyphs, so
+     remap sans/display/mono to the Persian font on fa to avoid mismatched fallback. */
+  html[lang='fa'] {
+    --font-sans: 'IRANYekanX', var(--font-fa);
+    --font-display: 'IRANYekanX', var(--font-fa);
+    --font-mono: 'IRANYekanX', var(--font-fa);
+  }
+  html[lang='fa'] body {
+    font-family: 'IRANYekanX', var(--font-fa), Tahoma, sans-serif;
+    line-height: 1.7;
+  }
+  /* Persian is a connected (cursive) script — letter-spacing breaks the joins, so
+     neutralize the Latin-oriented tracking on RTL text. */
+  html[lang='fa'] * {
+    letter-spacing: 0;
+  }
+  /* Persian headings: the Latin-tight leading clips ascenders/diacritics, and 800
+     weight reads heavy in Vazirmatn. Give them room and a cleaner 700. */
+  html[lang='fa'] h1,
+  html[lang='fa'] h2,
+  html[lang='fa'] h3,
+  html[lang='fa'] h4,
+  html[lang='fa'] .font-display,
+  html[lang='fa'] .h-section {
+    line-height: 1.42;
+    font-weight: 700;
+  }
+  /* Very large display headings can breathe a little tighter. */
+  html[lang='fa'] .text-5xl,
+  html[lang='fa'] .text-6xl,
+  html[lang='fa'] .text-7xl {
+    line-height: 1.3;
+  }
+  /* mono maps to Vazirmatn on fa, so keep figures column-aligned. */
+  html[lang='fa'] .font-mono,
+  html[lang='fa'] [class*='font-mono'] {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+  /* Numbers use the brand sans now, so keep them column-aligned everywhere. */
+  .font-mono {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+
+  ::selection {
+    background: rgba(46,235,158, 0.32);
+    color: #fff;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #020806;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #122C21;
+    border-radius: 999px;
+    border: 2px solid #020806;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #1A392B;
+  }
+
+  :focus-visible {
+    outline: 2px solid theme('colors.brand.400');
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+@layer components {
+  .container-x {
+    @apply mx-auto w-full max-w-7xl px-5 sm:px-6 lg:px-8;
+  }
+
+  .text-gradient {
+    @apply bg-brand-gradient bg-clip-text text-transparent;
+  }
+  .text-gradient-gold {
+    @apply bg-gold-gradient bg-clip-text text-transparent;
+  }
+
+  .card {
+    @apply rounded-3xl border border-brand-400/[0.14] bg-teal-900/30 backdrop-blur-sm;
+  }
+  /* Glowing green-edged panel used across the Propyar marketing pages */
+  .panel {
+    @apply rounded-2xl border border-brand-400/25 bg-gradient-to-b from-teal-800/50 to-ink-900/80 shadow-[inset_0_1px_0_0_rgba(46,235,158,0.08),0_0_30px_-18px_rgba(46,235,158,0.6)];
+  }
+  .btn-outline {
+    @apply btn border border-white/70 bg-transparent text-white hover:border-brand-300 hover:text-brand-200;
+  }
+  .card-teal {
+    @apply rounded-3xl border border-teal-700/40 bg-teal-800/30 backdrop-blur-sm;
+  }
+
+  .glass {
+    @apply border border-white/10 bg-white/[0.03] backdrop-blur-md;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+  .btn-primary {
+    @apply btn bg-brand-gradient font-bold text-ink-950 shadow-glow hover:brightness-110 hover:shadow-[0_0_50px_-6px_rgba(46,235,158,0.6)];
+  }
+  .btn-gold {
+    @apply btn bg-gold-gradient text-ink-950 shadow-glow-gold hover:brightness-110;
+  }
+  .btn-ghost {
+    @apply btn border border-white/12 bg-white/[0.02] text-white/90 hover:border-white/25 hover:bg-white/[0.05];
+  }
+  .btn-lg {
+    @apply px-7 py-3.5 text-base;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-2 rounded-full border border-brand-500/30 bg-brand-500/10 px-3 py-1 text-xs font-medium text-brand-200;
+  }
+
+  .field-label {
+    @apply mb-1.5 block text-sm font-medium text-white/70;
+  }
+  .field-input {
+    @apply w-full rounded-xl border border-white/10 bg-ink-850 px-4 py-2.5 text-sm text-white placeholder:text-white/30 transition-colors focus:border-brand-500/60 focus:outline-none focus:ring-2 focus:ring-brand-500/20;
+  }
+
+  .section {
+    @apply py-20 sm:py-28;
+  }
+  .eyebrow {
+    @apply text-sm font-semibold uppercase tracking-[0.2em] text-brand-400;
+  }
+  .h-section {
+    @apply text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-[2.75rem];
+  }
+}
+
+@layer utilities {
+  .animate-delay-100 {
+    animation-delay: 0.1s;
+  }
+  .animate-delay-200 {
+    animation-delay: 0.2s;
+  }
+  .animate-delay-300 {
+    animation-delay: 0.3s;
+  }
+  .animate-delay-500 {
+    animation-delay: 0.5s;
+  }
+  /* Logical margin helpers so RTL/LTR both work without flips */
+  .ms-auto {
+    margin-inline-start: auto;
+  }
+  .me-auto {
+    margin-inline-end: auto;
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "propyar",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "propyar", "run", "dev"],
+      "port": 3000
+    }
+  ]
+}

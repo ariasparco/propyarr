@@ -1,0 +1,52 @@
+{
+  "name": "prop-firm-platform",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "predev": "node scripts/sync-db-provider.mjs",
+    "dev": "next dev",
+    "prebuild": "node scripts/sync-db-provider.mjs",
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "postinstall": "prisma generate",
+    "db:push": "node scripts/sync-db-provider.mjs && prisma db push",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:studio": "prisma studio",
+    "test:email": "node scripts/test-email.mjs",
+    "test:monitor": "tsx scripts/test-monitor.ts",
+    "test:rules": "tsx scripts/test-rules-spec.ts",
+    "risk:replay": "tsx scripts/replay-account.ts",
+    "risk:repair": "tsx scripts/repair-risk-state.ts",
+    "metaapi:link": "tsx scripts/metaapi-link.ts",
+    "metaapi:mock": "tsx scripts/metaapi-mock.ts",
+    "feed:status": "node scripts/feed-status.mjs",
+    "account:reset": "node scripts/reset-account.mjs"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.2.1",
+    "bcryptjs": "^2.4.3",
+    "jose": "^5.9.6",
+    "next": "^15.1.6",
+    "nodemailer": "^6.9.16",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "vazirmatn": "^33.0.3",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^22.10.7",
+    "@types/nodemailer": "^6.4.17",
+    "@types/react": "^19.0.7",
+    "@types/react-dom": "^19.0.3",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "prisma": "^6.2.1",
+    "tailwindcss": "^3.4.17",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}

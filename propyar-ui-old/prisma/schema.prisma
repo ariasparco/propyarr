@@ -1,0 +1,355 @@
+// Prop firm platform — data model
+// Production runs on PostgreSQL (Neon/Vercel Postgres). DATABASE_URL is set as an
+// environment variable on the host.
+// Note: enum-like fields use String. Allowed values live in src/lib/constants.ts
+// and are validated with zod at the API boundary.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  passwordHash  String
+  role          String   @default("USER") // USER | ADMIN
+  emailVerified DateTime? // set once the signup code is confirmed
+  kycStatus     String   @default("NONE") // NONE | PENDING | APPROVED | REJECTED
+  country       String?
+  phone         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Store credit, in USD. Topped up by the trader, credited by referrals, and
+  // spent at checkout.
+  walletBalance Float  @default(0)
+  // Personal code others enter at signup. Generated on first use and never
+  // changed afterwards; nullable so existing rows migrate without a backfill.
+  referralCode  String? @unique
+  // Who referred this trader. Captured at signup only.
+  referredById  String?
+
+  orders          Order[]
+  tradingAccounts TradingAccount[]
+  payouts         Payout[]
+  auditLogs       AuditLog[]
+  kyc             Kyc?
+  authTokens      AuthToken[]
+  certificates    Certificate[]
+  walletEntries   WalletEntry[]
+  tickets         Ticket[]
+  referredBy      User?  @relation("Referrals", fields: [referredById], references: [id])
+  referrals       User[] @relation("Referrals")
+
+  @@index([email])
+  @@index([referredById])
+}
+
+// Every movement of store credit. The balance on User is the running total; this
+// is the ledger behind it, so any figure can be explained.
+model WalletEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  // Positive credits, negative debits.
+  amount    Float
+  // TOPUP | PURCHASE | REFERRAL | ADMIN | REFUND
+  type      String
+  note      String?
+  orderId   String?
+  balanceAfter Float
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model DiscountCode {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  percent     Int // 1–100
+  // Null applies the code to every plan.
+  challengeId String?
+  maxUses     Int? // null = unlimited
+  usedCount   Int       @default(0)
+  expiresAt   DateTime?
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+
+  challenge Challenge? @relation(fields: [challengeId], references: [id])
+
+  @@index([active])
+}
+
+model Ticket {
+  id        String   @id @default(cuid())
+  userId    String
+  subject   String
+  // OPEN | ANSWERED | CLOSED
+  status    String   @default("OPEN")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages TicketMessage[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model TicketMessage {
+  id        String   @id @default(cuid())
+  ticketId  String
+  fromAdmin Boolean  @default(false)
+  body      String
+  createdAt DateTime @default(now())
+
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+}
+
+// Single-use, expiring tokens for password resets. Only the hash is stored, so a
+// database leak cannot be replayed against the reset endpoint.
+model AuthToken {
+  id        String    @id @default(cuid())
+  userId    String
+  type      String // RESET | VERIFY
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  attempts  Int       @default(0) // wrong guesses, so short codes cannot be brute-forced
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Kyc {
+  id         String    @id @default(cuid())
+  userId     String    @unique
+  docType    String // shenasnameh | melli
+  // Uploads are written to disk and served through an authorised route.
+  // `image` holds the legacy inline data URI for rows created before that.
+  imagePath  String?
+  image      String?
+  status     String    @default("PENDING") // PENDING | APPROVED | REJECTED
+  createdAt  DateTime  @default(now())
+  reviewedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+}
+
+model Challenge {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  name           String
+  accountType    String   @default("TWO_STEP") // ONE_STEP | TWO_STEP | INSTANT
+  price          Float
+  virtualCapital Float
+  profitTarget   Float // phase 1 profit target, percent (e.g. 10 = 10%)
+  profitTargetP2 Float    @default(0) // phase 2 profit target, percent
+  dailyDrawdown  Float // percent
+  maxDrawdown    Float // percent
+  floatingRisk   Float    @default(0) // max floating/open risk, percent
+  minTradingDays Int      @default(0)
+  leverage       Int      @default(100)
+  profitSplit    Int      @default(80) // percent to trader
+  popular        Boolean  @default(false)
+  active         Boolean  @default(true)
+  comingSoon     Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  orders          Order[]
+  tradingAccounts TradingAccount[]
+  discountCodes   DiscountCode[]
+
+  @@index([active])
+}
+
+model Order {
+  id            String   @id @default(cuid())
+  userId        String
+  // Null for TOPUP orders: buying wallet credit is not buying a plan. It used
+  // to borrow an arbitrary challenge to satisfy this column, which made the
+  // order show up as a purchase of whatever plan happened to be first.
+  challengeId   String?
+  // What the customer actually owes after any discount and wallet credit.
+  amount        Float
+  currency      String   @default("USD")
+  // Rial amount quoted at checkout. Frozen here so the gateway verify step uses
+  // the same figure even if the USD rate moves in between.
+  amountRial    Float?
+  // Original list price, before discount or wallet credit.
+  listPrice     Float?
+  discountCode  String?
+  discountAmount Float   @default(0)
+  // How much of the price was settled from store credit.
+  walletAmount  Float    @default(0)
+  // Set once the referrer has been paid their share, so it happens only once.
+  referralPaidAt DateTime?
+  paymentStatus String   @default("PENDING") // PENDING | PAID | FAILED | REFUNDED
+  paymentMethod String   @default("mock") // paystar | usdt | mock
+  paymentRef    String?
+  // On-chain transfer that settled this order. Unique so one transfer can never
+  // settle two orders.
+  txHash        String?  @unique
+  // Chain height when the crypto invoice was issued, so verification scans an
+  // exact range instead of guessing from elapsed time.
+  chainFromBlock Int?
+  // Manual fulfillment: NONE (unpaid) | REVIEW (paid, awaiting admin) | COMPLETED
+  fulfillment   String   @default("NONE")
+  // PURCHASE — a paid challenge. PHASE_2 / FUNDED — a free follow-on account
+  // requested by a trader who passed the previous stage.
+  kind          String   @default("PURCHASE")
+  sourceAccountId String?
+  createdAt     DateTime @default(now())
+
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challenge      Challenge?      @relation(fields: [challengeId], references: [id])
+  tradingAccount TradingAccount?
+
+  @@index([userId])
+  @@index([paymentStatus])
+}
+
+model TradingAccount {
+  id              String   @id @default(cuid())
+  userId          String
+  orderId         String?  @unique
+  challengeId     String
+  accountNumber   String   @unique
+  platform        String   @default("MT5") // MT5 | cTrader | MatchTrader | TradeLocker
+  server          String   @default("Demo-Server")
+  password         String? // MT5 master password (entered by admin, shown to trader)
+  investorPassword String? // MT5 read-only password (used for monitoring)
+  startingBalance Float
+  balance         Float
+  equity          Float
+  status          String   @default("ACTIVE") // ACTIVE | PASSED | FAILED | FUNDED | DISABLED
+  phase           String   @default("PHASE_1") // PHASE_1 | PHASE_2 | FUNDED
+  tradingDays     Int      @default(0)
+  // Automated rule monitoring
+  metaApiId       String? // MetaApi provisioning id, when the account is linked
+  // Latest snapshot pushed by the terminal bridge.
+  openPositions   String? // JSON array of open positions
+  // Worst equity actually reached, not just what a two-minute poll happened to
+  // catch. The agent samples equity every few seconds and reports the low, so a
+  // dip that recovers before the next push still counts against the trader.
+  // Balance carried into the current trading day, captured at the first push
+  // after the broker's day rolls over. The daily limit is measured from this,
+  // exactly as brokers do it, rather than reconstructed by subtracting today's
+  // closed trades from the current balance -- a reconstruction that silently
+  // goes wrong whenever trade history is incomplete.
+  dayStartBalance Float?
+  dayLowEquity    Float? // lowest equity seen during the current trading day
+  dayLowKey       String? // which trading day the daily figures belong to
+  lowestEquity    Float? // lowest equity ever seen, for the overall drawdown
+  // Largest combined unrealised loss seen while two or more positions were
+  // open. A breach is a breach whenever it happened, so this never resets.
+  worstFloating   Float?
+  snapshotAt      DateTime? // when the bridge last reported
+  snapshotSource  String? // bridge | metaapi
+  lastCheckedAt   DateTime?
+  breachRule      String? // rule key that failed the account
+  breachedAt      DateTime?
+  breachSource    String? // AUTO | ADMIN
+  fundedAt        DateTime? // when the account became FUNDED — payout waiting period
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challenge Challenge @relation(fields: [challengeId], references: [id])
+  order     Order?    @relation(fields: [orderId], references: [id])
+  trades       Trade[]
+  payouts      Payout[]
+  certificates Certificate[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+// An achievement certificate an admin issues for a passed stage. The image is
+// produced outside the platform and uploaded here for the trader to download.
+model Certificate {
+  id        String   @id @default(cuid())
+  userId    String
+  accountId String
+  stage     String // PHASE_1 | PHASE_2 | FUNDED | PAYOUT
+  imagePath String
+  mime      String   @default("image/png")
+  note      String?
+  createdAt DateTime @default(now())
+
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account TradingAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, stage])
+  @@index([userId])
+}
+
+model Trade {
+  id         String    @id @default(cuid())
+  accountId  String
+  externalId String?   @unique // broker deal id, so syncs never duplicate
+  symbol     String
+  type       String // BUY | SELL
+  lot        Float
+  openPrice  Float
+  closePrice Float?
+  profit     Float     @default(0)
+  openedAt   DateTime  @default(now())
+  closedAt   DateTime?
+
+  account TradingAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId])
+}
+
+model Payout {
+  id          String    @id @default(cuid())
+  userId      String
+  accountId   String
+  amount      Float
+  currency    String    @default("USD")
+  method      String    @default("crypto") // crypto | bank | paypal
+  wallet      String
+  status      String    @default("REQUESTED") // REQUESTED | APPROVED | PAID | REJECTED
+  createdAt   DateTime  @default(now())
+  processedAt DateTime?
+
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account TradingAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  meta      String? // JSON string
+  ip        String?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([action])
+}
+
+model Setting {
+  key       String   @id
+  value     String // JSON string
+  updatedAt DateTime @updatedAt
+}

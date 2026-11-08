@@ -1,0 +1,10 @@
+{
+  "siteUrl": "https://propino.top",
+  "bridgeSecret": "the same value as BRIDGE_SECRET in the site's .env",
+  "intervalSeconds": 120,
+  "sampleSeconds": 2,
+  "historyDays": 60,
+  "terminalPath": "C:\\Program Files\\MetaTrader 5\\terminal64.exe",
+  "_accounts_note": "Accounts normally come from the site: an admin fills them in when completing an order, and the agent reads them from /api/bridge/roster. The list below is only a fallback for accounts the site does not know about. Leave it empty in normal operation.",
+  "accounts": []
+}

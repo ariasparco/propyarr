@@ -1,0 +1,91 @@
+# ── Database ──────────────────────────────────────────────
+# Dev uses SQLite (zero-config). For production swap to Postgres:
+#   DATABASE_URL="postgresql://user:pass@host:5432/propfirm?schema=public"
+# and change the provider in prisma/schema.prisma to "postgresql".
+DATABASE_URL="postgresql://propino:CHANGEME@127.0.0.1:5432/propino?schema=public"
+
+# ── Auth ──────────────────────────────────────────────────
+# CHANGE THESE in production. Generate with: openssl rand -base64 48
+JWT_ACCESS_SECRET="change-me"
+JWT_REFRESH_SECRET="change-me"
+
+# ── Site ──────────────────────────────────────────────────
+# In production set this to the live origin: https://propino.top
+NEXT_PUBLIC_SITE_URL="https://propino.top"
+NEXT_PUBLIC_SITE_NAME="PROPINO"
+
+# ── Payments ──────────────────────────────────────────────
+# Method switches. Set to "false" to hide a method from checkout entirely; the
+# API rejects it too, so a disabled method cannot be used by crafting a request.
+# The Rial gateway stays off until the PayStar contract is finalised.
+PAYMENTS_IRR_ENABLED="false"
+PAYMENTS_USDT_ENABLED="true"
+
+# PayStar (IRR gateway) — from your PayStar merchant panel:
+PAYSTAR_GATEWAY_ID=""
+PAYSTAR_SIGN_KEY=""
+# The USD rate is pulled live from public price feeds; this is only the fallback
+# used when every feed is unreachable.
+USD_IRR_RATE="1200000"          # Rial per 1 USD
+
+# USDT on BEP20 (BNB Smart Chain) — your receiving wallet + BscScan key:
+USDT_RECEIVE_ADDRESS="0x66c2Ae8635B54b0fCe8bc8316c01d98288644B17"
+# How long an unpaid crypto order stays open. Iranian exchanges often take
+# 30-60 minutes to broadcast a withdrawal, so keep this comfortably above that.
+USDT_ORDER_TTL_MINUTES="180"
+# The chain is read through public RPC nodes — no API key, no account, nothing
+# that can be revoked. Block explorers now gate BSC behind paid plans, so they
+# are not used. Override only if you want your own node or a different list.
+# BSC_RPC_URLS="https://your-node,https://another-node"
+# (Leave USDT_RECEIVE_ADDRESS empty to run crypto checkout in sandbox mode.)
+
+# ── Account monitoring ────────────────────────────────────
+TRADING_PROVIDER="mock"
+
+# Terminal bridge — the primary data path. The agent in /agent logs into each
+# MT5 account and pushes its state to /api/bridge/accounts using this secret.
+# Must match bridgeSecret in agent/config.json. Use a long random string.
+BRIDGE_SECRET="change-me"
+
+# The terminal-agent path is a fallback. MetaApi (below) is the primary source;
+# leave the agent switched off unless you are running one deliberately.
+
+# ── Automatic rule monitoring ─────────────────────────────
+# Built-in scheduler interval. Set to 0 to disable it and drive
+# /api/cron/monitor from an external cron instead (needed if you ever run more
+# than one app instance).
+# How often every account is re-checked. Seconds wins when both are present.
+# 15-30s keeps breaches close to live; the real floor is how fast the upstream
+# data itself updates, not this timer.
+MONITOR_INTERVAL_SECONDS="20"
+MONITOR_INTERVAL_MINUTES="5"
+
+# The crypto sweep runs on its own, slower clock - it reads the chain over
+# public RPC nodes, so there is nothing to gain from checking it as often.
+USDT_SWEEP_SECONDS="300"
+
+# MetaApi - the account data source. Register each account in the MetaApi panel
+# and paste the id it returns into the admin panel when handing the account
+# over. The region is detected per account, so nothing else is needed here.
+METAAPI_TOKEN=""
+CRON_SECRET="change-me"
+
+# ── Payout policy ─────────────────────────────────────────
+PAYOUT_MIN_USD="50"
+PAYOUT_MIN_DAYS="14"
+
+# ── Email (SMTP) ──────────────────────────────────────────
+# Liara mail service. Fill in once the mailbox is created in the Liara panel.
+# Leave empty to run without email — messages are logged, nothing breaks.
+SMTP_HOST="smtp.c1.liara.email"
+# 465 = implicit TLS. The provider has flipped between 465 and 587 before, so the
+# mailer falls back to the other port automatically if this one refuses.
+SMTP_PORT="465"
+# Created in the Liara panel under Email → propino.top → SMTP → "افزودن کاربر SMTP".
+SMTP_USER="sharp_sutherland_h1gh6a"
+SMTP_PASS="d9e3d241-9dee-425a-8404-785c9d40d4c9"
+SMTP_FROM="PROPINO <noreply@propino.top>"
+
+# ── File storage ──────────────────────────────────────────
+# Identity documents are written here, outside the public folder.
+STORAGE_DIR="C:\propino\storage"

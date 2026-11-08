@@ -1,0 +1,42 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# next.js
+/.next/
+/out/
+next-env.d.ts
+
+# production
+/build
+
+# env
+.env
+.env*.local
+
+# database
+/prisma/*.db
+/prisma/*.db-journal
+/prisma/dev.db
+
+# misc
+.DS_Store
+*.pem
+*.tsbuildinfo
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+
+# uploaded identity documents
+/storage
+
+# MT5 agent credentials
+agent/config.json
